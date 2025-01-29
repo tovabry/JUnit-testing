@@ -9,6 +9,7 @@ public class BookingSystem {
     private final RoomRepository roomRepository;
     private final NotificationService notificationService;
 
+
     public BookingSystem(TimeProvider timeProvider,
                          RoomRepository roomRepository,
                          NotificationService notificationService) {
@@ -97,4 +98,3 @@ public class BookingSystem {
     }
 }
 
-// Stödklasser och interface som behövs:
