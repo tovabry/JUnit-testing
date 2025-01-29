@@ -78,6 +78,8 @@ public class BookingSystemTest {
     public void bookingAllowedRoomAndDateShouldSaveRoomAndReturnConfirmation() throws NotificationException {
         LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
         Room mockRoom = new Room("room1", "Konferensrum");
+
+        //simulerar att rummet finns i databasen
         when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
         doThrow(new NotificationException("Notification failed")).when(notificationService).sendBookingConfirmation(any(Booking.class));
 
@@ -86,9 +88,25 @@ public class BookingSystemTest {
         assertTrue(result);
         //kontrollerar att save-metoden anropas
         verify(roomRepository).save(any(Room.class));
-        verify(notificationService).sendBookingConfirmation(any(Booking.class)); // Kontrollera att notifieringen försöktes skickas
+        //kontrollerar att sendBookingConfirmation anropas
+        verify(notificationService).sendBookingConfirmation(any(Booking.class)); //Kontrollera att notifieringen försöktes skickas
     }
 
+    @Test
+    @DisplayName("Booking an unavailable date should return false")
+    public void bookingNonAvailableDateShouldReturnFalse() {
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        Room mockRoom = mock(Room.class); // Mock av rummet
+
+        // Simulerar att rummet inte är tillgängligt
+        when(mockRoom.isAvailable(startTime, startTime.plusHours(1))).thenReturn(false);
+
+        // Mockar roomRepository för att returnera mockRoom
+        when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
+
+        boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
+        assertFalse(result);
+    }
 
 
 }
