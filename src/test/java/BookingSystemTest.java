@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class BookingSystemTest {
     @Mock TimeProvider timeProvider;
@@ -72,6 +72,23 @@ public class BookingSystemTest {
         });
         assertEquals("Rummet existerar inte", exception.getMessage());
     }
+
+    @Test
+    @DisplayName("Booking allowed room and date should save room and return confirmation")
+    public void bookingAllowedRoomAndDateShouldSaveRoomAndReturnConfirmation() throws NotificationException {
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        Room mockRoom = new Room("room1", "Konferensrum");
+        when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
+        doThrow(new NotificationException("Notification failed")).when(notificationService).sendBookingConfirmation(any(Booking.class));
+
+        boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
+
+        assertTrue(result);
+        //kontrollerar att save-metoden anropas
+        verify(roomRepository).save(any(Room.class));
+        verify(notificationService).sendBookingConfirmation(any(Booking.class)); // Kontrollera att notifieringen försöktes skickas
+    }
+
 
 
 }
