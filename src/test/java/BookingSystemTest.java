@@ -25,24 +25,23 @@ public class BookingSystemTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        //setup för att få ett mockat localdatetime
+        LocalDateTime currentTime = LocalDateTime.of(2025, 1, 29, 12, 0, 0);
+        when(timeProvider.getCurrentTime()).thenReturn(currentTime);
     }
 
     @Test
     @DisplayName("Booking time is incorrect returns illegal Exceptions")
     public void BookingTimeIsIncorrectReturnsIllegalExceptions() {
-        Exception validTimeException = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom(null, null, null));
-        assertEquals("Bokning kräver giltiga start- och sluttider samt rum-id", validTimeException.getMessage());
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom(null, null, null));
+        assertEquals("Bokning kräver giltiga start- och sluttider samt rum-id", exception.getMessage());
 
     }
 
     @Test
     @DisplayName("Booking a room in the past should throw exception")
     public void bookingInThePastThrowsException() {
-
-        // Mocka current time
-        LocalDateTime currentTime = LocalDateTime.of(2025, 1, 29, 12, 0, 0);
-        when(timeProvider.getCurrentTime()).thenReturn(currentTime);
-
         // Mocka att ett rum med id "room1" existerar
         Room mockRoom = new Room("room1", "Konferensrum");
         when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
@@ -53,5 +52,26 @@ public class BookingSystemTest {
 
         assertEquals("Kan inte boka tid i dåtid", exception.getMessage());
     }
+
+    @Test
+    @DisplayName("Booking non existing room should throw exception")
+    public void bookingNonExistingRoomThrowsException() {
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 1, 1, 12, 0, 0);
+
+        // Försök att boka ett rum som inte finns (room2)
+        String nonExistentRoomId = "room2";
+        // Mocka att rum med id "room1" finns men inte "room2"
+        Room mockRoom = new Room("room1", "Konferensrum");
+        when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
+        when(roomRepository.findById(nonExistentRoomId)).thenReturn(Optional.empty());  // Mocka att "room2" inte finns
+
+        // Test: Förvänta att en exception kastas när man försöker boka ett icke-existerande rum
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            bookingSystem.bookRoom(nonExistentRoomId, startTime, startTime.plusHours(1));
+        });
+        assertEquals("Rummet existerar inte", exception.getMessage());
+    }
+
 
 }
