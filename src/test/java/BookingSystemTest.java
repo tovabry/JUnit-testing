@@ -8,7 +8,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -107,6 +106,5 @@ public class BookingSystemTest {
         boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
         assertFalse(result);
     }
-
 
 }
