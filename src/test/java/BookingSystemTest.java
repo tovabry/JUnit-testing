@@ -3,12 +3,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -146,23 +149,42 @@ public class BookingSystemTest {
         assertEquals("Sluttid måste vara efter starttid", exception.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Returns a list of available rooms")
-    public void returnsAListOfAvailableRooms() {
-
-        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
-        Room availableRoom = mock(Room.class);
-        Room bookedRoom = mock(Room.class);
-        when(availableRoom.isAvailable(startTime, endTime)).thenReturn(true);
-        when(bookedRoom.isAvailable(startTime, endTime)).thenReturn(false);
-
-        List<Room> rooms = List.of(availableRoom, bookedRoom);
+    @MethodSource("provideRoomsForAvailabilityTest")
+    public void returnsAListOfAvailableRooms(List<Room> rooms, LocalDateTime startTime, LocalDateTime endTime) {
         when(roomRepository.findAll()).thenReturn(rooms);
+
         List<Room> availableRooms = bookingSystem.getAvailableRooms(startTime, endTime);
 
-        assertTrue(availableRooms.contains(availableRoom));
-        assertFalse(availableRooms.contains(bookedRoom));
+        for (Room room : rooms) {
+            if (room.isAvailable(startTime, endTime)) {
+                assertTrue(availableRooms.contains(room), "Expected room to be available: " + room);
+            } else {
+                assertFalse(availableRooms.contains(room), "Expected room to be booked: " + room);
+            }
+        }
+    }
+
+    private static Stream<Arguments> provideRoomsForAvailabilityTest() {
+        Room availableRoom1 = mock(Room.class);
+        Room availableRoom2 = mock(Room.class);
+        Room bookedRoom1 = mock(Room.class);
+        Room bookedRoom2 = mock(Room.class);
+
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 1, 0);
+
+        when(availableRoom1.isAvailable(startTime, endTime)).thenReturn(true);
+        when(availableRoom2.isAvailable(startTime, endTime)).thenReturn(true);
+        when(bookedRoom1.isAvailable(startTime, endTime)).thenReturn(false);
+        when(bookedRoom2.isAvailable(startTime, endTime)).thenReturn(false);
+
+        return Stream.of(
+                Arguments.of(Arrays.asList(availableRoom1, bookedRoom1), startTime, endTime),
+                Arguments.of(Arrays.asList(availableRoom2, bookedRoom2), startTime, endTime),
+                Arguments.of(Arrays.asList(availableRoom1, availableRoom2, bookedRoom1), startTime, endTime)
+        );
     }
 
     @Test
