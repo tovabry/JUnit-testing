@@ -222,6 +222,29 @@ public class BookingSystemTest {
 
     }
 
+    @Test
+    public void testCancelBookingHandlesNotificationException() throws NotificationException {
+        String bookingId = "booking123";
+        Booking mockBooking = mock(Booking.class);
+
+        when(mockBooking.getStartTime()).thenReturn(LocalDateTime.of(2025, 4, 1, 12, 0, 0));
+
+        doThrow(new NotificationException("Failed to send cancellation")).when(notificationService).sendCancellationConfirmation(mockBooking);
+
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.hasBooking(bookingId)).thenReturn(true);
+        when(mockRoom.getBooking(bookingId)).thenReturn(mockBooking);
+
+        List<Room> rooms = Arrays.asList(mockRoom);
+        when(roomRepository.findAll()).thenReturn(rooms);
+
+        boolean result = bookingSystem.cancelBooking(bookingId);
+
+        assertTrue(result, "Cancel booking should return true even if notification fails");
+        verify(notificationService).sendCancellationConfirmation(mockBooking);
+    }
+
+
 
 
 
