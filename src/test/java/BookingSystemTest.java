@@ -7,8 +7,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -17,6 +21,7 @@ public class BookingSystemTest {
     @Mock TimeProvider timeProvider;
     @Mock RoomRepository roomRepository;
     @Mock NotificationService notificationService;
+
     @InjectMocks
     BookingSystem bookingSystem;
 
@@ -123,10 +128,29 @@ public class BookingSystemTest {
     @DisplayName("End time before start time returns illegal exception")
     public void endTimeBeforeStartTimeReturnsIllegalException() {
         LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 3, 1, 12, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(startTime, endTime));
         assertEquals("Sluttid måste vara efter starttid", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Returns a list of available rooms")
+    public void returnsAListOfAvailableRooms() {
+
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
+        Room availableRoom = mock(Room.class);
+        Room bookedRoom = mock(Room.class);
+        when(availableRoom.isAvailable(startTime, endTime)).thenReturn(true);
+        when(bookedRoom.isAvailable(startTime, endTime)).thenReturn(false);
+
+        List<Room> rooms = List.of(availableRoom, bookedRoom);
+        when(roomRepository.findAll()).thenReturn(rooms);
+        List<Room> availableRooms = bookingSystem.getAvailableRooms(startTime, endTime);
+
+        assertTrue(availableRooms.contains(availableRoom));
+        assertFalse(availableRooms.contains(bookedRoom));
     }
 
 
