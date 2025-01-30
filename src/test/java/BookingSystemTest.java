@@ -30,6 +30,8 @@ public class BookingSystemTest {
         when(timeProvider.getCurrentTime()).thenReturn(currentTime);
     }
 
+
+
     @Test
     @DisplayName("Booking time is incorrect returns illegal Exceptions")
     public void BookingTimeIsIncorrectReturnsIllegalExceptions() {
@@ -106,5 +108,26 @@ public class BookingSystemTest {
         boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
         assertFalse(result);
     }
+
+
+
+
+    @Test
+    @DisplayName("Incorrect booking time returns illegal exception")
+    public void incorrectBookingTimeReturnsIllegalException() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(null, null));
+        assertEquals("Måste ange både start- och sluttid", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("End time before start time returns illegal exception")
+    public void endTimeBeforeStartTimeReturnsIllegalException() {
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 3, 1, 12, 0, 0);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(startTime, endTime));
+        assertEquals("Sluttid måste vara efter starttid", exception.getMessage());
+    }
+
 
 }
