@@ -25,12 +25,10 @@ public class BookingSystemTest {
     @InjectMocks
     BookingSystem bookingSystem;
 
-    //Initierar mocksen
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        //setup för att få ett mockat localdatetime
         LocalDateTime currentTime = LocalDateTime.of(2025, 1, 29, 12, 0, 0);
         when(timeProvider.getCurrentTime()).thenReturn(currentTime);
     }
@@ -61,8 +59,8 @@ public class BookingSystemTest {
     @Test
     @DisplayName("Trying to book with end time before start time returns illegal exception in getAvailableRoom")
     public void tryingToBookWithEndTimeBeforeStartTimeReturnsIllegalException() {
-        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
-        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime startTime = LocalDateTime.of(2025, 10, 1, 12, 0, 1);
+        LocalDateTime endTime = LocalDateTime.of(2025, 10, 1, 12, 0, 0);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom("room1", startTime, endTime));
         assertEquals("Sluttid måste vara efter starttid", exception.getMessage());
@@ -74,14 +72,11 @@ public class BookingSystemTest {
 
         LocalDateTime startTime = LocalDateTime.of(2026, 1, 1, 12, 0, 0);
 
-        // Försök att boka ett rum som inte finns (room2)
         String nonExistentRoomId = "room2";
-        // Mocka att rum med id "room1" finns men inte "room2"
         Room mockRoom = new Room("room1", "Konferensrum");
         when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
         when(roomRepository.findById(nonExistentRoomId)).thenReturn(Optional.empty());  // Mocka att "room2" inte finns
 
-        // Test: Förvänta att en exception kastas när man försöker boka ett icke-existerande rum
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             bookingSystem.bookRoom(nonExistentRoomId, startTime, startTime.plusHours(1));
         });
@@ -91,19 +86,16 @@ public class BookingSystemTest {
     @Test
     @DisplayName("Booking allowed room and date should save room and return confirmation")
     public void bookingAllowedRoomAndDateShouldSaveRoomAndReturnConfirmation() throws NotificationException {
-        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime startTime = LocalDateTime.of(2026, 7, 1, 12, 0, 0);
         Room mockRoom = new Room("room1", "Konferensrum");
 
-        //simulerar att rummet finns i databasen
         when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
         doThrow(new NotificationException("Notification failed")).when(notificationService).sendBookingConfirmation(any(Booking.class));
 
         boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
 
         assertTrue(result);
-        //kontrollerar att save-metoden anropas
         verify(roomRepository).save(any(Room.class));
-        //kontrollerar att sendBookingConfirmation anropas
         verify(notificationService).sendBookingConfirmation(any(Booking.class)); //Kontrollera att notifieringen försöktes skickas
     }
 
@@ -111,12 +103,10 @@ public class BookingSystemTest {
     @DisplayName("Booking an unavailable date should return false")
     public void bookingNonAvailableDateShouldReturnFalse() {
         LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
-        Room mockRoom = mock(Room.class); // Mock av rummet
+        Room mockRoom = mock(Room.class);
 
-        // Simulerar att rummet inte är tillgängligt
         when(mockRoom.isAvailable(startTime, startTime.plusHours(1))).thenReturn(false);
 
-        // Mockar roomRepository för att returnera mockRoom
         when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
 
         boolean result = bookingSystem.bookRoom("room1", startTime, startTime.plusHours(1));
@@ -215,15 +205,12 @@ public class BookingSystemTest {
     public void cancelBookingSuccessfully() {
         String bookingId = "booking123";
 
-        // Mockar ett rum som har en bokning
         Room mockRoom = mock(Room.class);
         Booking mockBooking = mock(Booking.class);
 
-        // Mockar att getStartTime() returnerar ett specifikt starttid för bokningen
         LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
         when(mockBooking.getStartTime()).thenReturn(startTime);
 
-        // Simulerar att rummet har den specifika bokningen
         when(mockRoom.hasBooking(bookingId)).thenReturn(true);
         when(mockRoom.getBooking(bookingId)).thenReturn(mockBooking);
 
@@ -244,7 +231,6 @@ public class BookingSystemTest {
 
         assertFalse(result, "Result should be false if no room with the bookingId exists");
 
-        // Verifierar att findAll() anropades för att få listan på alla rum
         verify(roomRepository).findAll();
     }
 
@@ -256,7 +242,7 @@ public class BookingSystemTest {
         Room mockRoom = mock(Room.class);
         Booking mockBooking = mock(Booking.class);
 
-        LocalDateTime startTime = LocalDateTime.of(2024, 4, 1, 12, 0, 0);
+        LocalDateTime startTime = LocalDateTime.of(2025, 1, 29, 11, 0, 0);
         when(mockBooking.getStartTime()).thenReturn(startTime);
 
         when(mockRoom.hasBooking(bookingId)).thenReturn(true);
@@ -291,10 +277,4 @@ public class BookingSystemTest {
         assertTrue(result, "Cancel booking should return true even if notification fails");
         verify(notificationService).sendCancellationConfirmation(mockBooking);
     }
-
-
-
-
-
-
 }
