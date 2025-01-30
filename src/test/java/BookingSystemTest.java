@@ -32,8 +32,6 @@ public class BookingSystemTest {
         when(timeProvider.getCurrentTime()).thenReturn(currentTime);
     }
 
-
-
     @Test
     @DisplayName("Booking time is incorrect returns illegal Exceptions")
     public void BookingTimeIsIncorrectReturnsIllegalExceptions() {
@@ -122,12 +120,21 @@ public class BookingSystemTest {
         assertFalse(result);
     }
 
-    @Test
-    @DisplayName("Incorrect booking time returns illegal exception in GetAvaliableRoom")
-    public void incorrectBookingTimeReturnsIllegalExceptionInGetAvaliableRoom() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(null, null));
+    @ParameterizedTest
+    @DisplayName("Incorrect booking time returns illegal exception in GetAvailableRoom")
+    @CsvSource({
+            "'2025-01-01T12:00:00', null",
+            "null, '2025-01-01T12:00:01'"
+    })
+    public void incorrectBookingTimeReturnsIllegalExceptionInGetAvailableRoom(String start, String end) {
+        LocalDateTime startTime = (start != null && !start.equals("null")) ? LocalDateTime.parse(start) : null;
+        LocalDateTime endTime = (end != null && !end.equals("null")) ? LocalDateTime.parse(end) : null;
+
+        // Kontrollera att ett undantag kastas om start eller sluttid är null
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(startTime, endTime));
         assertEquals("Måste ange både start- och sluttid", exception.getMessage());
     }
+
 
     @Test
     @DisplayName("End time before start time returns illegal exception in getAvailableRoom")
