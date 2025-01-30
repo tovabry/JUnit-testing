@@ -5,12 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -55,6 +52,16 @@ public class BookingSystemTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom("room1", pastTime, pastTime.plusHours(1)));
 
         assertEquals("Kan inte boka tid i dåtid", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Trying to book with end time before start time returns illegal exception in getAvailableRoom")
+    public void tryingToBookWithEndTimeBeforeStartTimeReturnsIllegalException() {
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
+        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom("room1", startTime, endTime));
+        assertEquals("Sluttid måste vara efter starttid", exception.getMessage());
     }
 
     @Test
@@ -113,15 +120,15 @@ public class BookingSystemTest {
     }
 
     @Test
-    @DisplayName("Incorrect booking time returns illegal exception")
-    public void incorrectBookingTimeReturnsIllegalException() {
+    @DisplayName("Incorrect booking time returns illegal exception in GetAvaliableRoom")
+    public void incorrectBookingTimeReturnsIllegalExceptionInGetAvaliableRoom() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(null, null));
         assertEquals("Måste ange både start- och sluttid", exception.getMessage());
     }
 
     @Test
-    @DisplayName("End time before start time returns illegal exception")
-    public void endTimeBeforeStartTimeReturnsIllegalException() {
+    @DisplayName("End time before start time returns illegal exception in getAvailableRoom")
+    public void endTimeBeforeStartTimeReturnsIllegalExceptionInGetAvailableRoom() {
         LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
         LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
 
