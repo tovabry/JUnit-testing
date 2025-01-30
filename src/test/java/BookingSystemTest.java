@@ -153,5 +153,12 @@ public class BookingSystemTest {
         assertFalse(availableRooms.contains(bookedRoom));
     }
 
+    @Test
+    @DisplayName("Cancel booking input can't be null")
+    public void cancelBookingInputCanNotBeNull() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.cancelBooking(null));
+        assertEquals("Boknings-id kan inte vara null", exception.getMessage());
+    }
+
 
 }
