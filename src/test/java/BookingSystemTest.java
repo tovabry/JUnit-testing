@@ -2,6 +2,8 @@ import com.example.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -40,17 +42,18 @@ public class BookingSystemTest {
 
     }
 
-    @Test
-    @DisplayName("Booking a room in the past should throw exception")
-    public void bookingInThePastThrowsException() {
-        // Mocka att ett rum med id "room1" existerar
-        Room mockRoom = new Room("room1", "Konferensrum");
-        when(roomRepository.findById("room1")).thenReturn(Optional.of(mockRoom));
+    @ParameterizedTest
+    @DisplayName("Booking in the past should throw exception")
+    @CsvSource({
+            "room1, 2025-01-29T11:59:59",
+            "room2, 2024-12-25T10:00:00"
+    })
+    public void bookingInThePastThrowsException(String roomId, String pastTime) {
+        LocalDateTime startTime = LocalDateTime.parse(pastTime);
+        Room mockRoom = new Room(roomId, "Konferensrum");
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(mockRoom));
 
-        // Testa att boka en tid i dåtid
-        LocalDateTime pastTime = LocalDateTime.of(2023, 1, 1, 12, 0, 0);
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom("room1", pastTime, pastTime.plusHours(1)));
-
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.bookRoom(roomId, startTime, startTime.plusHours(1)));
         assertEquals("Kan inte boka tid i dåtid", exception.getMessage());
     }
 
@@ -153,6 +156,22 @@ public class BookingSystemTest {
 
         assertTrue(availableRooms.contains(availableRoom));
         assertFalse(availableRooms.contains(bookedRoom));
+    }
+
+    @Test
+    @DisplayName("Get available rooms should return empty list if no rooms are available")
+    public void getAvailableRoomsShouldReturnEmptyListIfNoRoomsAvailable() {
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 1, 0);
+
+        Room mockRoom = mock(Room.class);
+        when(mockRoom.isAvailable(startTime, endTime)).thenReturn(false);
+
+        List<Room> rooms = List.of(mockRoom);
+        when(roomRepository.findAll()).thenReturn(rooms);
+
+        List<Room> availableRooms = bookingSystem.getAvailableRooms(startTime, endTime);
+        assertTrue(availableRooms.isEmpty(), "Available rooms should be empty if no rooms are available");
     }
 
     @Test
