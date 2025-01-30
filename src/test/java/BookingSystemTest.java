@@ -8,10 +8,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.awt.print.Book;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,9 +112,6 @@ public class BookingSystemTest {
         assertFalse(result);
     }
 
-
-
-
     @Test
     @DisplayName("Incorrect booking time returns illegal exception")
     public void incorrectBookingTimeReturnsIllegalException() {
@@ -181,15 +175,32 @@ public class BookingSystemTest {
         List<Room> rooms = Arrays.asList(mockRoom);
         when(roomRepository.findAll()).thenReturn(rooms);
 
-
         boolean result = bookingSystem.cancelBooking(bookingId);
-
         assertTrue(result);
-
         verify(mockRoom).getBooking(bookingId);
     }
 
+    @Test
+    @DisplayName("roomWithBooking should return illegalStateEx if trying to cancel a current or terminated booking")
+    public void roomWithBookingShouldReturnIllegalStateExIfTryingToCancelACurrentOrTerminatedBooking() {
+        String bookingId = "booking123";
 
+        Room mockRoom = mock(Room.class);
+        Booking mockBooking = mock(Booking.class);
+
+        LocalDateTime startTime = LocalDateTime.of(2024, 4, 1, 12, 0, 0);
+        when(mockBooking.getStartTime()).thenReturn(startTime);
+
+        when(mockRoom.hasBooking(bookingId)).thenReturn(true);
+        when(mockRoom.getBooking(bookingId)).thenReturn(mockBooking);
+
+        List<Room> rooms = Arrays.asList(mockRoom);
+        when(roomRepository.findAll()).thenReturn(rooms);
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> bookingSystem.cancelBooking(bookingId));
+        assertEquals("Kan inte avboka påbörjad eller avslutad bokning", exception.getMessage());
+
+    }
 
 
 
