@@ -181,6 +181,19 @@ public class BookingSystemTest {
     }
 
     @Test
+    @DisplayName("Cancel booking should return false if no room with the booking ID exists")
+    public void cancelBookingRoomNotFound() {
+        String bookingId = "booking123";
+        when(roomRepository.findAll()).thenReturn(Collections.emptyList());
+        boolean result = bookingSystem.cancelBooking(bookingId);
+
+        assertFalse(result, "Result should be false if no room with the bookingId exists");
+
+        // Verifierar att findAll() anropades för att få listan på alla rum
+        verify(roomRepository).findAll();
+    }
+
+    @Test
     @DisplayName("roomWithBooking should return illegalStateEx if trying to cancel a current or terminated booking")
     public void roomWithBookingShouldReturnIllegalStateExIfTryingToCancelACurrentOrTerminatedBooking() {
         String bookingId = "booking123";
