@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,7 +128,7 @@ public class BookingSystemTest {
     @Test
     @DisplayName("End time before start time returns illegal exception")
     public void endTimeBeforeStartTimeReturnsIllegalException() {
-        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 1);
         LocalDateTime endTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.getAvailableRooms(startTime, endTime));
@@ -159,6 +160,39 @@ public class BookingSystemTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> bookingSystem.cancelBooking(null));
         assertEquals("Boknings-id kan inte vara null", exception.getMessage());
     }
+
+    @Test
+    @DisplayName("Cancel booking should return true if booking exists")
+    public void cancelBookingSuccessfully() {
+        String bookingId = "booking123";
+
+        // Mockar ett rum som har en bokning
+        Room mockRoom = mock(Room.class);
+        Booking mockBooking = mock(Booking.class);
+
+        // Mockar att getStartTime() returnerar ett specifikt starttid för bokningen
+        LocalDateTime startTime = LocalDateTime.of(2025, 4, 1, 12, 0, 0);
+        when(mockBooking.getStartTime()).thenReturn(startTime);
+
+        // Simulerar att rummet har den specifika bokningen
+        when(mockRoom.hasBooking(bookingId)).thenReturn(true);
+        when(mockRoom.getBooking(bookingId)).thenReturn(mockBooking);
+
+        List<Room> rooms = Arrays.asList(mockRoom);
+        when(roomRepository.findAll()).thenReturn(rooms);
+
+
+        boolean result = bookingSystem.cancelBooking(bookingId);
+
+        assertTrue(result);
+
+        verify(mockRoom).getBooking(bookingId);
+    }
+
+
+
+
+
 
 
 }
