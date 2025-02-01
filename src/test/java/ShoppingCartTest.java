@@ -30,9 +30,17 @@ public class ShoppingCartTest {
     @Test
     @DisplayName("Adding the same item name in cart should increase quantity of the object")
     void AddingTheSameItemNameInCartShouldIncreaseQuantityOfTheObject() {
-        cart.addItem("cream of boar", 25.50, 22);
-        cart.addItem("cream of boar", 25.50, 1);
+        cart.addItem("cream of boar", 20.90, 22);
+        cart.addItem("cream of boar", 20.90, 1);
         assertEquals(23, cart.getQuantity("cream of boar"), "Quantity should be the total of the two objects");
+    }
+
+    @Test
+    @DisplayName("Should return total price")
+    void ShouldReturnTotalPrice() {
+        cart.addItem("cream of mushrooms", 25.50, 13);
+        cart.addItem("cream of boar", 20.90, 3);
+        assertEquals(394.20, cart.getTotalPrice(), "Total price should be the total of items quality x the items price");
     }
 
 }

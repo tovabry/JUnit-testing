@@ -26,4 +26,12 @@ public class ShoppingCart {
 
     public int getQuantity(String productName) {
         return items.containsKey(productName) ? items.get(productName).getQuantity() : 0;    }
+
+    public double getTotalPrice() {
+        double total = 0.0;
+        for (Item item : items.values()) {
+            total += item.getPrice() * item.getQuantity();
+        }
+        return total;
+    }
 }
