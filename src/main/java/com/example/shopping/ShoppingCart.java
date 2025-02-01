@@ -15,4 +15,7 @@ public class ShoppingCart {
         return items.size();
     }
 
+    public void removeItem(String itemName) {
+        items.remove(itemName);
+    }
 }

@@ -20,4 +20,11 @@ public class ShoppingCartTest {
         assertEquals(1, cart.itemCount(), "Cart should contain only one item");
     }
 
+    @Test
+    @DisplayName("Deleting an item should return an empty cart")
+    void DeletingAnItemShouldReturnAnEmptyCart() {
+        cart.removeItem("cream of mushrooms");
+        assertEquals(0, cart.itemCount(), "Cart should contain zero items");
+    }
+
 }
