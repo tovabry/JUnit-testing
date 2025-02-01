@@ -8,7 +8,12 @@ public class ShoppingCart {
 
 
     public void addItem(String productName, double price, int quantity) {
-    items.put(productName, new Item(productName, price, quantity));
+        if (items.containsKey(productName)) {
+            Item existingItem = items.get(productName);
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+        } else {
+            items.put(productName, new Item(productName, price, quantity));
+        }
     }
 
     public int itemCount() {
@@ -18,4 +23,7 @@ public class ShoppingCart {
     public void removeItem(String itemName) {
         items.remove(itemName);
     }
+
+    public int getQuantity(String productName) {
+        return items.containsKey(productName) ? items.get(productName).getQuantity() : 0;    }
 }

@@ -8,7 +8,7 @@ public class Item{
     public Item(String name, double price, int quantity) {
         this.name = name;
         this.price = price;
-        this.quantity = 0;
+        this.quantity = quantity;
     }
 
     public String getName() {

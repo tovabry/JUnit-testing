@@ -27,4 +27,12 @@ public class ShoppingCartTest {
         assertEquals(0, cart.itemCount(), "Cart should contain zero items");
     }
 
+    @Test
+    @DisplayName("Adding the same item name in cart should increase quantity of the object")
+    void AddingTheSameItemNameInCartShouldIncreaseQuantityOfTheObject() {
+        cart.addItem("cream of boar", 25.50, 22);
+        cart.addItem("cream of boar", 25.50, 1);
+        assertEquals(23, cart.getQuantity("cream of boar"), "Quantity should be the total of the two objects");
+    }
+
 }
