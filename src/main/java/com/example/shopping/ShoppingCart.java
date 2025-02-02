@@ -7,12 +7,12 @@ public class ShoppingCart {
     private final Map<String, Item> items = new HashMap<>();
 
 
-    public void addItem(String productName, double price, int quantity) {
+    public void addItem(String productName, double price, int quantity, double discountPercentage) {
         if (items.containsKey(productName)) {
             Item existingItem = items.get(productName);
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
         } else {
-            items.put(productName, new Item(productName, price, quantity));
+            items.put(productName, new Item(productName, price, quantity, discountPercentage));
         }
     }
 
@@ -30,8 +30,10 @@ public class ShoppingCart {
     public double getTotalPrice() {
         double total = 0.0;
         for (Item item : items.values()) {
-            total += item.getPrice() * item.getQuantity();
-        }
+            double discountedPrice = item.getDiscountedPrice();
+            total += discountedPrice * item.getQuantity();
+            }
         return total;
     }
+
 }
