@@ -81,6 +81,14 @@ public class ShoppingCartTest {
         assertEquals(0, cart.itemCount(), "Cart should contain zero items when adding with negative quantity");
     }
 
+    @Test
+    @DisplayName("getQuantity should return the correct positive quantity")
+    void GetQuantityShouldReturnCorrectPositiveQuantity() {
+        cart.addItem("cream of mushrooms", 25.50, 10, 0);
+        assertEquals(10, cart.getQuantity("cream of mushrooms"), "Quantity should be 10 when initialized with 10");
+    }
+
+
 
 
 }
