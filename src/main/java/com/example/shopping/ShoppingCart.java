@@ -8,13 +8,14 @@ public class ShoppingCart {
 
 
     public void addItem(String productName, double price, int quantity, double discountPercentage) {
-        if (items.containsKey(productName)) {
+        if (productName.equals("cream of boar") && quantity >6) {
+            throw new IllegalArgumentException("We can only provide our customers with 6 cream of boars maximum per person");
+        }if (items.containsKey(productName)) {
             Item existingItem = items.get(productName);
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-        } else if (quantity > 0) {
+        }else if (quantity > 0) {
             items.put(productName, new Item(productName, price, quantity, discountPercentage));
-        }
-    }
+        }}
 
     public int itemCount() {
         return items.size();

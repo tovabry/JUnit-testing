@@ -3,7 +3,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ShoppingCartTest {
     private ShoppingCart cart;
@@ -30,9 +30,9 @@ public class ShoppingCartTest {
     @Test
     @DisplayName("Adding the same item name in cart should increase quantity of the object")
     void AddingTheSameItemNameInCartShouldIncreaseQuantityOfTheObject() {
-        cart.addItem("cream of boar", 20.90, 22, 0);
-        cart.addItem("cream of boar", 20.90, 1, 0);
-        assertEquals(23, cart.getQuantity("cream of boar"), "Quantity should be the total of the two objects");
+        cart.addItem("cream of salad", 20.90, 22, 0);
+        cart.addItem("cream of salad", 20.90, 1, 0);
+        assertEquals(23, cart.getQuantity("cream of salad"), "Quantity should be the total of the two objects");
     }
 
     @Test
@@ -86,6 +86,19 @@ public class ShoppingCartTest {
     void GetQuantityShouldReturnCorrectPositiveQuantity() {
         cart.addItem("cream of mushrooms", 25.50, 10, 0);
         assertEquals(10, cart.getQuantity("cream of mushrooms"), "Quantity should be 10 when initialized with 10");
+    }
+
+    @Test
+    @DisplayName("customer should not be able to put more than 6 cream of boar in the cart")
+    void customerShouldNotBeAbleToPutMoreThan6CreamOfBarInCart() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->{
+            cart.addItem("cream of boar", 25.50, 7, 0);
+        });
+
+        String exceptionMessage = "We can only provide our customers with 6 cream of boars maximum per person";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(exceptionMessage));
     }
 
 
