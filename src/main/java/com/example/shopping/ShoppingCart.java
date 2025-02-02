@@ -38,5 +38,8 @@ public class ShoppingCart {
 
     public void updateQuantity(String productName, int quantity) {
         items.get(productName).setQuantity(quantity);
+        if (quantity < 1) {
+            items.remove(productName);
+        }
     }
 }

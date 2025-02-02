@@ -66,4 +66,13 @@ public class ShoppingCartTest {
         assertEquals(3, cart.getQuantity("cream of intestine"), "Item should contain the update of the quantity");
     }
 
+    @Test
+    @DisplayName("Updating quantity to zero should remove the item from the cart")
+    void UpdatingQuantityToZeroShouldRemoveTheItemFromTheCart() {
+        cart.addItem("cream of intestine", 50.40, 10, 0);
+        cart.updateQuantity("cream of intestine", 0);
+        assertEquals(0, cart.itemCount(), "Cart should contain zero items after setting quantity to zero");
+    }
+
+
 }
