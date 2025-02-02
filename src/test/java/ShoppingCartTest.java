@@ -54,8 +54,16 @@ public class ShoppingCartTest {
     @Test
     @DisplayName("Adding item with zero quantity should not add an item to cart")
     void addingItemWithZeroQuantityShouldNotAddAnItemToCart() {
-        cart.addItem("cream of mushrooms", 25.50, 0,0);
+        cart.addItem("cream of deer", 25.50, 0,0);
         assertEquals(0, cart.itemCount(), "Cart should contain zero items");
+    }
+
+    @Test
+    @DisplayName("Updated quantity on item should return new quantity value")
+    void UpdatedQuantityOnItemShouldReturnQuantityValue() {
+        cart.addItem("cream of intestine", 50.40, 10, 0);
+        cart.updateQuantity("cream of intestine", 3);
+        assertEquals(3, cart.getQuantity("cream of intestine"), "Item should contain the update of the quantity");
     }
 
 }

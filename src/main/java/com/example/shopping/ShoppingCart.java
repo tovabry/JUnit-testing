@@ -36,4 +36,7 @@ public class ShoppingCart {
         return total;
     }
 
+    public void updateQuantity(String productName, int quantity) {
+        items.get(productName).setQuantity(quantity);
+    }
 }
