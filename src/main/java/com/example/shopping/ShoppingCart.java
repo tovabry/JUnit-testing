@@ -11,7 +11,7 @@ public class ShoppingCart {
         if (items.containsKey(productName)) {
             Item existingItem = items.get(productName);
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-        } else {
+        } else if (quantity > 0) {
             items.put(productName, new Item(productName, price, quantity, discountPercentage));
         }
     }

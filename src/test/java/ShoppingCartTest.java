@@ -51,4 +51,11 @@ public class ShoppingCartTest {
         assertEquals(39.85, cart.getTotalPrice(), "Items should have a discounts");
     }
 
+    @Test
+    @DisplayName("Adding item with zero quantity should not add an item to cart")
+    void addingItemWithZeroQuantityShouldNotAddAnItemToCart() {
+        cart.addItem("cream of mushrooms", 25.50, 0,0);
+        assertEquals(0, cart.itemCount(), "Cart should contain zero items");
+    }
+
 }
