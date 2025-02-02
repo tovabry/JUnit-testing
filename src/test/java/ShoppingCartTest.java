@@ -74,5 +74,13 @@ public class ShoppingCartTest {
         assertEquals(0, cart.itemCount(), "Cart should contain zero items after setting quantity to zero");
     }
 
+    @Test
+    @DisplayName("Adding an item with negative quantity should not add the item to the cart")
+    void AddingAnItemWithNegativeQuantityShouldNotAddTheItemToTheCart() {
+        cart.addItem("cream of deer", 25.50, -1, 0);
+        assertEquals(0, cart.itemCount(), "Cart should contain zero items when adding with negative quantity");
+    }
+
+
 
 }
