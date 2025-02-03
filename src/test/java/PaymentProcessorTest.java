@@ -60,4 +60,14 @@ public class PaymentProcessorTest {
         verify(emailService).sendPaymentConfirmation("user@example.com", amount);
     }
 
+    @Test
+    @DisplayName("Failed payment should not update database")
+    void failedPaymentShouldNotUpdateDatabaseOrSendEmail() throws SQLException {
+        PaymentApiResponse failedResponse = new PaymentApiResponse(false);
+        when(paymentApi.charge("sk_test_123456", 200.0)).thenReturn(failedResponse);
+        boolean result = paymentProcessor.processPayment(200.0);
+        assertFalse(result);
+        verify(databaseConnection, Mockito.never()).executeUpdate(Mockito.anyString());
+    }
+
 }
