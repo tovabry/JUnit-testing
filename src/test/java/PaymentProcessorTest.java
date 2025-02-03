@@ -88,4 +88,12 @@ public class PaymentProcessorTest {
         assertFalse(result);
     }
 
+    @Test
+    @DisplayName("processPayment should return true on successful payment")
+    void processPaymentShouldReturnTrueOnSuccess() throws SQLException {
+        when(paymentApi.charge("sk_test_123456", 90.0)).thenReturn(new PaymentApiResponse(true));
+        boolean result = paymentProcessor.processPayment(90.0);
+        assertTrue(result);
+    }
+
 }
