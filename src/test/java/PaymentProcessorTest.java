@@ -10,8 +10,8 @@ import org.mockito.MockitoAnnotations;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,6 +94,16 @@ public class PaymentProcessorTest {
         when(paymentApi.charge("sk_test_123456", 90.0)).thenReturn(new PaymentApiResponse(true));
         boolean result = paymentProcessor.processPayment(90.0);
         assertTrue(result, "Make sure the method processPayment returns true when the payment does go through");
+    }
+
+    @Test
+    @DisplayName("Right amount should be sent to the right email")
+    void rightAmountShouldBeSentToTheRightEmail() throws SQLException {
+        double amount = 60.2;
+        PaymentApiResponse successfulResponse = new PaymentApiResponse(true);
+        when(paymentApi.charge("sk_test_123456", amount)).thenReturn(successfulResponse);
+        paymentProcessor.processPayment(amount);
+        verify(emailService).sendPaymentConfirmation(eq("user@example.com"), eq(60.2));
     }
 
 }
