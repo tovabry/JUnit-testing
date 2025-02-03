@@ -22,10 +22,6 @@ public class PaymentProcessor {
         if (response.isSuccess()) {
             databaseConnection.getInstance()
                     .executeUpdate("INSERT INTO payments (amount, status) VALUES (" + amount + ", 'SUCCESS')");
-        }
-
-        // Skickar e-post direkt
-        if (response.isSuccess()) {
             emailService.sendPaymentConfirmation("user@example.com", amount);
         }
 

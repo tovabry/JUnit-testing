@@ -2,11 +2,10 @@ package com.example.payment;
 
 import java.sql.PreparedStatement;
 
-public class DatabaseConnection {
+public interface DatabaseConnection {
+    public PreparedStatement getInstance();
 
-    public PreparedStatement getInstance() {
-        return null;
-    }
+    void executeUpdate(String s);
 }
 
 
