@@ -47,7 +47,7 @@ public class PaymentProcessorTest {
         double amount = 100.0;
         when(paymentApi.charge("sk_test_123456", amount)).thenReturn(response);
         boolean result = paymentProcessor.processPayment(amount);
-        assertTrue(result);
+        assertTrue(result, "The method processPayment should return true in this scenario");
         verify(preparedStatement).executeUpdate(Mockito.anyString());
     }
 
@@ -66,7 +66,7 @@ public class PaymentProcessorTest {
         PaymentApiResponse failedResponse = new PaymentApiResponse(false);
         when(paymentApi.charge("sk_test_123456", 200.0)).thenReturn(failedResponse);
         boolean result = paymentProcessor.processPayment(200.0);
-        assertFalse(result);
+        assertFalse(result, "The method processPayment should return false in this scenario");
         verify(databaseConnection, Mockito.never()).executeUpdate(Mockito.anyString());
     }
 
@@ -76,7 +76,7 @@ public class PaymentProcessorTest {
         PaymentApiResponse failedResponse = new PaymentApiResponse(false);
         when(paymentApi.charge("sk_test_123456", 100.0)).thenReturn(failedResponse);
         boolean result = paymentProcessor.processPayment(100.0);
-        assertFalse(result);
+        assertFalse(result, "The method processPayment should return false in this scenario");
         verify(emailService, Mockito.never()).sendPaymentConfirmation(Mockito.anyString(), Mockito.anyDouble());
     }
 
@@ -85,7 +85,7 @@ public class PaymentProcessorTest {
     void processPaymentShouldReturnFalseOnFailure() throws SQLException {
         when(paymentApi.charge("sk_test_123456", 100.0)).thenReturn(new PaymentApiResponse(false));
         boolean result = paymentProcessor.processPayment(100.0);
-        assertFalse(result);
+        assertFalse(result, "Make sure the method processPayment returns false when the payment doesnt go through");
     }
 
     @Test
@@ -93,7 +93,7 @@ public class PaymentProcessorTest {
     void processPaymentShouldReturnTrueOnSuccess() throws SQLException {
         when(paymentApi.charge("sk_test_123456", 90.0)).thenReturn(new PaymentApiResponse(true));
         boolean result = paymentProcessor.processPayment(90.0);
-        assertTrue(result);
+        assertTrue(result, "Make sure the method processPayment returns true when the payment does go through");
     }
 
 }
