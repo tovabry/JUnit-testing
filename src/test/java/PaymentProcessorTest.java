@@ -80,4 +80,12 @@ public class PaymentProcessorTest {
         verify(emailService, Mockito.never()).sendPaymentConfirmation(Mockito.anyString(), Mockito.anyDouble());
     }
 
+    @Test
+    @DisplayName("processPayment should return false on failed payment")
+    void processPaymentShouldReturnFalseOnFailure() throws SQLException {
+        when(paymentApi.charge("sk_test_123456", 100.0)).thenReturn(new PaymentApiResponse(false));
+        boolean result = paymentProcessor.processPayment(100.0);
+        assertFalse(result);
+    }
+
 }
