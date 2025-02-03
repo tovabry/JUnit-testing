@@ -50,4 +50,14 @@ public class PaymentProcessorTest {
         assertTrue(result);
         verify(preparedStatement).executeUpdate(Mockito.anyString());
     }
+
+    @Test
+    @DisplayName("Successful payment should send email to payer")
+    void successfulPaymentShouldSendEmailToPayer() throws SQLException {
+        double amount = 55.50;
+        when(paymentApi.charge("sk_test_123456", amount)).thenReturn(response);
+        paymentProcessor.processPayment(amount);
+        verify(emailService).sendPaymentConfirmation("user@example.com", amount);
+    }
+
 }
